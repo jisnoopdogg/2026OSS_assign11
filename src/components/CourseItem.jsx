@@ -1,3 +1,4 @@
+// Props로 데이터를 받고 이벤트 콜백 호출
 // [제공] 부모 CourseList로부터 Props를 전달받는 자식 컴포넌트입니다.
 export default function CourseItem({ course, onDelete, onToggle }) {
   return (
