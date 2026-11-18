@@ -7,6 +7,7 @@ export default function CourseList() {
   // [제공] 초기 배열을 useState로 관리합니다.
   const [courses, setCourses] = useState(initialCourses);
   const [newName, setNewName] = useState("");
+  const [search, setSearch] = useState("");
 
   // [제공] 삭제 기능: filter로 새 배열을 만들어 업데이트합니다.
   function handleDelete(id) {
@@ -17,15 +18,48 @@ export default function CourseList() {
   // TODO 1 (필수): 과목 추가 기능을 구현하세요.
   function handleAdd(event) {
     event.preventDefault();
-    // TODO: 빈 입력 검사, 새 과목 객체 생성, setCourses 호출, 입력창 초기화
+
+    // 빈 입력 검사
+    const name = newName.trim();
+    if (name === "") {
+      alert("과목명을 입력하세요.");
+      return;
+    }
+
+    // 새 과목 객체 생성
+    const newId = Math.max(0, ...courses.map((c) => c.id)) + 1;
+    const newCourse = {
+      id: newId,
+      name: name,
+      category: "Major",
+      completed: false,
+    };
+
+    // setCourses 호출
+    setCourses((prev) => [...prev, newCourse]);
+
+    // 입력창 초기화
+    setNewName("");
   }
 
   // TODO 2 (필수): 완료 상태 변경 기능을 구현하세요.
   function handleToggle(id) {
     // TODO: map과 spread(...)를 사용하여 해당 id의 completed를 반전
+    setCourses((prev) =>
+      prev.map((course) => {
+        if (course.id === id) {
+          return { ...course, completed: !course.completed };
+        }
+        return course;
+      }),
+    );
   }
 
   const doneCount = courses.filter((course) => course.completed).length;
+
+  const filteredCourses = courses.filter((course) =>
+    course.name.includes(search),
+  );
 
   return (
     <>
@@ -63,15 +97,28 @@ export default function CourseList() {
             + Add Course
           </button>
         </form>
+
+        <div className="tools">
+          <input
+            className="input"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="과목명 검색"
+            aria-label="과목명 검색"
+          />
+        </div>
+
         <div className="list-head">
           <span>COURSE</span>
           <span>CATEGORY</span>
           <span>ACTIONS</span>
         </div>
-        {courses.length === 0 && (
-          <div className="empty">등록된 과목이 없습니다.</div>
+        {filteredCourses.length === 0 && (
+          <div className="empty">
+            {courses.length === 0 ? "등록된 과목이 없습니다." : "검색 결과가 없습니다."}
+          </div>
         )}
-        {courses.map((course) => (
+        {filteredCourses.map((course) => (
           <CourseItem
             key={course.id}
             course={course}
